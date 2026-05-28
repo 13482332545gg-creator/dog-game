@@ -38,7 +38,22 @@ canvas{display:block}
 #bark-btn:active{background:rgba(255,100,0,.9);transform:scale(.9)}
 #jump-btn{position:fixed;bottom:150px;right:35px;width:55px;height:55px;border-radius:50%;background:rgba(100,180,255,.6);border:2px solid rgba(255,255,255,.4);z-index:200;touch-action:none;display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;box-shadow:0 4px 12px rgba(100,180,255,.3);user-select:none;-webkit-user-select:none;cursor:pointer}
 #jump-btn:active{background:rgba(60,140,255,.85);transform:scale(.9)}
-@media(min-width:1025px){#joystick-zone,#bark-btn,#jump-btn{display:none}}
+@media(min-width:1025px){#joystick-zone,#bark-btn,#jump-btn,#orient-tip{display:none}}
+/* 竖屏适配 */
+@media(orientation:portrait){
+  #joystick-zone{bottom:100px;left:20px;width:120px;height:120px}
+  #joystick-base{width:100px;height:100px}
+  #joystick-thumb{width:42px;height:42px}
+  #bark-btn{bottom:120px;right:25px;width:55px;height:55px;font-size:24px}
+  #jump-btn{bottom:190px;right:25px;width:48px;height:48px;font-size:20px}
+  #minimap{bottom:110px;right:20px;width:120px;height:120px}
+  #hud{padding:8px}
+  #info{font-size:13px}
+  #action-hint{font-size:11px}
+  #yum-bar-wrap{width:220px;height:14px}
+}
+#orient-tip{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:150;pointer-events:none;color:#fff;font-size:14px;background:rgba(0,0,0,.6);padding:8px 16px;border-radius:20px;opacity:0;transition:opacity .4s}
+#orient-tip.show{opacity:1}
 
 #evolve-flash{position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;z-index:50;pointer-events:none;opacity:0;transition:opacity .1s}
 #evolve-flash.active{opacity:.6;transition:opacity 0s}
@@ -70,6 +85,7 @@ canvas{display:block}
 <div id="joystick-zone">
   <div id="joystick-base"><div id="joystick-thumb"></div></div>
 </div>
+<div id="orient-tip" class="show">? 旋转手机横屏体验更佳</div>
 <div id="bark-btn">??</div>
 <div id="jump-btn">?</div><div id="evolve-flash"></div>
 
@@ -814,7 +830,7 @@ function updFoods(delta){
 }
 
 // ============ 事件 ============
-ssEl.addEventListener('click',function(){if(isMobile){ssEl.style.display='none';started=true;ah.textContent='?? 四处嗅探探索中...';}else{renderer.domElement.requestPointerLock();}});
+ssEl.addEventListener('click',function(){if(isMobile){ssEl.style.display='none';started=true;ah.textContent='?? 四处嗅探探索中...';try{document.body.requestFullscreen().catch(function(){});}catch(e){}setTimeout(function(){var t=document.getElementById('orient-tip');if(t)t.classList.remove('show')},3000);}else{renderer.domElement.requestPointerLock();}});
 document.addEventListener('pointerlockchange',function(){
   locked=document.pointerLockElement===renderer.domElement;
   if(locked){ssEl.style.display='none';started=true;ah.textContent='?? 四处嗅探探索中...';}
@@ -830,7 +846,7 @@ document.addEventListener('wheel',function(e){
 document.addEventListener('mousedown',function(e){if(e.button===0&&locked)bark();});
 document.addEventListener('keydown',function(e){keys[e.code]=true;if(e.code==='KeyE'&&locked)bark();});
 document.addEventListener('keyup',function(e){keys[e.code]=false;});
-window.addEventListener('resize',function(){renderer.setSize(window.innerWidth,window.innerHeight);camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();});
+window.addEventListener('resize',function(){renderer.setSize(window.innerWidth,window.innerHeight);camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();});window.addEventListener('orientationchange',function(){setTimeout(function(){renderer.setSize(window.innerWidth,window.innerHeight);camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();var t=document.getElementById('orient-tip');if(t)t.classList.remove('show')},300);});
 // ============ 移动端触控 ============
 joystickZone=document.getElementById("joystick-zone");
 joystickBase=document.getElementById("joystick-base");
